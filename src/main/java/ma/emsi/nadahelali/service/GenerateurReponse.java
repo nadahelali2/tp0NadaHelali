@@ -1,3 +1,4 @@
+
 package ma.emsi.nadahelali.service;
 
 import jakarta.enterprise.context.Dependent;
@@ -6,28 +7,41 @@ import java.io.Serializable;
 import java.util.Locale;
 
 /**
- * Classe de service pour les modificateurs de question.
- * Un modificateur de question prend en entrée une question et retourne
- * la question modifiée.
+ * Classe de service pour générer une réponse personnalisée
+ * selon le contenu de la question.
  */
-@Dependent // Portée CDI pour rendre la classe injectable par CDI dans les autres classes.
-// Portée Dependent : l'instance sera supprimée quand la classe qui l'a injectée sera supprimée.
-public class GenerateurReponse implements Serializable { // Car CDI peut mettre l'instance en mémoire secondaire.
+@Dependent
+public class GenerateurReponse implements Serializable {
+
     /**
-     * Modificateur de question.
-     * @param question La question à modifier.
-     * @param roleSysteme Le rôle système à utiliser pour la modification de la question.
-     * @return La question modifiée : le rôle système en majuscule au début de la question, s'il n'est pas null,
-     * suivi d'un saut de ligne,
-     * puis la question en minuscule, le tout entouré de "||".
+     * Génère une réponse en fonction de la question saisie.
+     *
+     * @param question La question de l'utilisateur.
+     * @param roleSysteme Le rôle choisi pour la conversation.
+     * @return Une réponse personnalisée.
      */
     public String genererReponse(String question, String roleSysteme) {
-        String resultat = "||";
-        if (roleSysteme != null) {
-            // Ajouter le rôle système en majuscule au début du résultat, suivi d'un saut de ligne.
-            resultat += roleSysteme.toUpperCase(Locale.FRENCH) + "\n";
+
+        String texte = question.trim().toLowerCase(Locale.FRENCH);
+        String reponse;
+
+        if (texte.contains("bonjour") || texte.contains("salut")) {
+            reponse = "Bonjour ! Comment puis-je vous aider ?";
+        } else if (texte.contains("merci")) {
+            reponse = "Avec plaisir !";
+        } else if (texte.contains("comment vas-tu") ||
+                texte.contains("comment allez-vous")) {
+            reponse = "Je vais très bien, merci !";
+        } else if (texte.contains("au revoir") || texte.contains("bye")) {
+            reponse = "Au revoir et à bientôt !";
+        } else {
+            reponse = "Vous avez écrit : " + question.trim();
         }
-        resultat += question.toLowerCase(Locale.FRENCH) + "||";
-        return resultat;
+
+        if (roleSysteme != null && !roleSysteme.isBlank()) {
+            reponse = "Rôle : " + roleSysteme + "\n" + reponse;
+        }
+
+        return reponse;
     }
 }
